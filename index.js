@@ -51,7 +51,7 @@ io.on("connection", socket => {
      socket.on("loadMessages", async (data) => {
         console.log("load messages içindeyim")
         console.log(data)
-        const otherUserId = data.otherUserId;
+        const otherUserId =data.otherUserId ?? data[0]?.otherUserId;
         const currentUserId = socket.user.id;
 
         console.log("Bu diger kullanıcının id'si" +otherUserId)
