@@ -49,12 +49,14 @@ io.on("connection", socket => {
     console.log("Yeni kullanıcı bağlandı:", socket.id, "userId:", socket.user.id);
 
      socket.on("loadMessages", async (data) => {
+        console.log("load messages içindeyim")
         console.log(data)
         const otherUserId = data.otherUserId;
         const currentUserId = socket.user.id;
 
         console.log("Bu diger kullanıcının id'si" +otherUserId)
         console.log("Bu benim kullanıcımın id'si"+currentUserId)
+        console.log("Load messages bitti abi")
 
 
         // Channel id oluştur: küçükId_büyükId formatı
