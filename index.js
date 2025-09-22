@@ -155,6 +155,10 @@ app.get("/users", authenticate, async (req, res) => {
     }
 });
 
+app.get("/whoami", authenticate, (req, res) => {
+    res.json({ id: req.user.id, email: req.user.email });
+});
+
 // ----------------------------
 // Middleware: Access token doğrulama
 // ----------------------------
