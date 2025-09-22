@@ -7,6 +7,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const http = require("http");               // 1️⃣ HTTP server için
 const { Server } = require("socket.io");    // 2️⃣ Socket.io
+const { type } = require("os");
 
 const app = express();                       // 3️⃣ Express app önce
 const server = http.createServer(app);       // 4️⃣ Server sonra
@@ -51,6 +52,7 @@ io.on("connection", socket => {
      socket.on("loadMessages", async (data) => {
         console.log("load messages içindeyim")
         console.log(data)
+        console.log(typeof(data))
         const otherUserId =data.otherUserId ?? data[0]?.otherUserId;
         const currentUserId = socket.user.id;
 
