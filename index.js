@@ -30,19 +30,56 @@ const REFRESH_SECRET = "supersecretrefresh";
 // ----------------------------
 // Register
 // ----------------------------
+// Register endpoint
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
+
     try {
-        const hashed = await bcrypt.hash(password, 10);
-        const result = await pool.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email",
-            [email, hashed]
+        // 1. Email daha önce var mı kontrol et
+        const existingUser = await pool.query(
+            "SELECT id FROM users WHERE email=$1",
+            [email]
         );
-        res.json({ user: result.rows[0] });
+
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({ error: "Email zaten kayıtlı." });
+        }
+
+        // 2. Şifreyi hashle
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // 3. Yeni kullanıcıyı ekle
+        const newUser = await pool.query(
+            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email",
+            [email, hashedPassword]
+        );
+
+        const user = newUser.rows[0];
+
+        // 4. Access ve refresh token oluştur
+        const accessToken = jwt.sign(
+            { id: user.id, email: user.email },
+            ACCESS_SECRET,
+            { expiresIn: "15m" }
+        );
+        const refreshToken = jwt.sign(
+            { id: user.id, email: user.email },
+            REFRESH_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        // 5. Client'a tokenları döndür
+        res.json({
+            accessToken,
+            refreshToken
+        });
+
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: "Sunucu hatası." });
     }
 });
+
 
 // ----------------------------
 // Login
@@ -69,8 +106,8 @@ app.post("/login", async (req, res) => {
 // ----------------------------
 // Refresh token
 // ----------------------------
-app.post("/refresh", (req, res) => {
-    const { token } = req.body;
+app.post("/refresh", (req, res) => { //buraya refresh tokenı gönderiyorsun
+    const { token } = req.body; //json şeklinde refresh tokenı alıyorum burda
     if (!token) return res.sendStatus(401);
 
     jwt.verify(token, REFRESH_SECRET, (err, user) => {
@@ -90,7 +127,8 @@ function authenticate(req, res, next) {
 
     jwt.verify(token, ACCESS_SECRET, (err, user) => {
         if (err) return res.sendStatus(401);
-        req.user = user;
+        req.user = user;  //req.user jwt kimlik dogrulaması eğer başarılıysa token içindeki payload bilgisini taşıyan yapı payload aslında json verisi taşıyor
+        //request user jsonunu ekliyor aslında burda.
         next();
     });
 }
