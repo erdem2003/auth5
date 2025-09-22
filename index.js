@@ -5,12 +5,16 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { Server } = require("socket.io");
-const io = new Server(server, { cors: { origin: "*" } });
+const http = require("http");               // 1️⃣ HTTP server için
+const { Server } = require("socket.io");    // 2️⃣ Socket.io
 
-const app = express();
+const app = express();                       // 3️⃣ Express app önce
+const server = http.createServer(app);       // 4️⃣ Server sonra
+const io = new Server(server, { cors: { origin: "*" } });  // 5️⃣ io en son
+
 app.use(cors());
 app.use(bodyParser.json());
+
 
 // PostgreSQL bağlantısı
 const pool = new Pool({
