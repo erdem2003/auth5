@@ -35,16 +35,47 @@ const REFRESH_SECRET = "supersecretrefresh";
 
 
 //socketim
+io.use((socket, next) => {
+    const token = socket.handshake.query?.token;
+    if (!token) return next(new Error("Auth error"));
+    jwt.verify(token, ACCESS_SECRET, (err, user) => {
+        if (err) return next(new Error("Auth error"));
+        socket.user = user; // payload içindeki id ve email
+        next();
+    });
+});
+
 io.on("connection", socket => {
-    console.log("Yeni kullanıcı bağlandı:", socket.id);
+    console.log("Yeni kullanıcı bağlandı:", socket.id, "userId:", socket.user.id);
 
-   
+     socket.on("loadMessages", async (data) => {
+        const otherUserId = data.otherUserId;
+        const currentUserId = socket.user.id;
 
+        // Channel id oluştur: küçükId_büyükId formatı
+        const channelId = currentUserId < otherUserId 
+            ? `${currentUserId}_${otherUserId}` 
+            : `${otherUserId}_${currentUserId}`;
+
+        try {
+            const result = await pool.query(
+                "SELECT * FROM messages WHERE channel_id=$1 ORDER BY created_at ASC",
+                [channelId]
+            );
+            
+            // Client’a sadece kendi kanalındaki mesajları gönder
+            socket.emit("messagesLoaded", result.rows);
+        } catch (err) {
+            console.error("Mesajları yüklerken hata:", err);
+            socket.emit("error", { message: "Mesajlar yüklenemedi" });
+        }
+    });
+    
+  
     socket.on("disconnect", () => {
         console.log("Kullanıcı ayrıldı:", socket.id);
     });
 });
-
 
 
 // ----------------------------
@@ -153,10 +184,6 @@ app.get("/users", authenticate, async (req, res) => {
         console.error("Kullanıcıları getirirken hata:", err);
         res.status(500).json({ error: "Sunucu hatası" });
     }
-});
-
-app.get("/whoami", authenticate, (req, res) => {
-    res.json({ id: req.user.id, email: req.user.email });
 });
 
 // ----------------------------
