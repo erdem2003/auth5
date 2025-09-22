@@ -53,7 +53,7 @@ io.on("connection", socket => {
         console.log("load messages içindeyim")
         console.log(data)
         console.log(typeof(data))
-        const otherUserId =data.otherUserId ?? data[0]?.otherUserId;
+        const otherUserId =data.otherUserId
         const currentUserId = socket.user.id;
 
         console.log("Bu diger kullanıcının id'si" +otherUserId)
