@@ -178,4 +178,4 @@ app.get("/profile", authenticate, (req, res) => {
     res.json({ message: "Profil bilgileri", user: req.user });
 });
 
-app.listen(3000, () => console.log("Auth server 3000 portunda çalışıyor 🚀"));
+server.listen(3000, () => console.log("Auth server 3000 portunda çalışıyor 🚀"));
