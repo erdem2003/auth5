@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { Server } = require("socket.io");
+const io = new Server(server, { cors: { origin: "*" } });
 
 const app = express();
 app.use(cors());
@@ -26,6 +28,20 @@ const REFRESH_SECRET = "supersecretrefresh";
 
 // Kullanıcı tablosu (PostgreSQL)
 // CREATE TABLE users (id SERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
+
+
+//socketim
+io.on("connection", socket => {
+    console.log("Yeni kullanıcı bağlandı:", socket.id);
+
+   
+
+    socket.on("disconnect", () => {
+        console.log("Kullanıcı ayrıldı:", socket.id);
+    });
+});
+
+
 
 // ----------------------------
 // Register
