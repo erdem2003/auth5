@@ -49,6 +49,7 @@ io.on("connection", socket => {
     console.log("Yeni kullanıcı bağlandı:", socket.id, "userId:", socket.user.id);
 
      socket.on("loadMessages", async (data) => {
+        console.log(data)
         const otherUserId = data.otherUserId;
         const currentUserId = socket.user.id;
 
