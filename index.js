@@ -52,8 +52,8 @@ io.on("connection", socket => {
         const otherUserId = data.otherUserId;
         const currentUserId = socket.user.id;
 
-        console.log(otherUserId)
-        console.log(currentUserId)
+        console.log("Bu diger kullanıcının id'si" +otherUserId)
+        console.log("Bu benim kullanıcımın id'si"+currentUserId)
 
 
         // Channel id oluştur: küçükId_büyükId formatı
