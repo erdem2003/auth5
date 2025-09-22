@@ -52,6 +52,10 @@ io.on("connection", socket => {
         const otherUserId = data.otherUserId;
         const currentUserId = socket.user.id;
 
+        console.log(otherUserId)
+        console.log(currentUserId)
+
+
         // Channel id oluştur: küçükId_büyükId formatı
         const channelId = currentUserId < otherUserId 
             ? `${currentUserId}_${otherUserId}` 
@@ -62,7 +66,7 @@ io.on("connection", socket => {
                 "SELECT * FROM messages WHERE channel_id=$1 ORDER BY created_at ASC",
                 [channelId]
             );
-            
+            console.log(result.rows)
             // Client’a sadece kendi kanalındaki mesajları gönder
             socket.emit("messagesLoaded", result.rows);
         } catch (err) {
