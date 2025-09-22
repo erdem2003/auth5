@@ -201,7 +201,12 @@ function authenticate(req, res, next) {
         next();
     });
 }
-
+app.get("/whoami", authenticate, (req, res) => {
+    res.json({ 
+        id:req.user.id,
+        email: req.user.email // burada id ve email payload olarak dönüyor
+    });
+});
 // ----------------------------
 // Korunan endpoint
 // ----------------------------
