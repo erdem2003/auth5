@@ -81,10 +81,11 @@ io.on("connection", socket => {
         }
     });
 socket.on("sendMessage", async (data) => {
+    console.log("sendMessage içindeyim.")
     console.log(data)
     const { otherUserId, message } = data;
     const currentUserId = socket.user.id;
-
+    console.log("mesajı atan "+currentUserId + " mesajı alan " + otherUserId + " ve mesaj" + message)
     const channelId = currentUserId < otherUserId 
         ? `${currentUserId}_${otherUserId}` 
         : `${otherUserId}_${currentUserId}`;
