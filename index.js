@@ -97,7 +97,8 @@ socket.on("sendMessage", async (data) => {
         );
 
         const newMsg = result.rows[0];
-
+        
+        console(typeof(otherUserId) + " türü bu other userıd nin türü bu ")
         // Gönderen cihazına
         socket.emit("messageSent", newMsg);
 
