@@ -48,7 +48,7 @@ io.use((socket, next) => {
 
 io.on("connection", socket => {
     console.log("Yeni kullanıcı bağlandı:", socket.id, "userId:", socket.user.id);
-     socket.join(socket.user.toString());//oda olusturuyoruz userId'si ile.
+     socket.join(socket.user.id.toString());//oda olusturuyoruz userId'si ile.
 
      socket.on("loadMessages", async (data) => {
         console.log("load messages içindeyim")
