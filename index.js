@@ -100,7 +100,7 @@ socket.on("sendMessage", async (data) => {
         // Gönderen cihazına
         socket.emit("messageSent", newMsg);
 
-        // Alıcıya
+        // Alıcıya .  O socketin gerçekten açık degilse o zaman hiçbir şey yapmaz.Hata fırlatmaz yani bu kullanıcı online mı degil mi diye kontrol etmene gerek yok.
         io.to(otherUserId.toString()).emit("newMessage", newMsg);
 
     } catch (err) {
