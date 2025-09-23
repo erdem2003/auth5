@@ -48,7 +48,8 @@ io.use((socket, next) => {
 
 io.on("connection", socket => {
     console.log("Yeni kullanıcı bağlandı:", socket.id, "userId:", socket.user.id);
-
+     socket.join(userId.toString());//oda olusturuyoruz userId'si ile.
+     
      socket.on("loadMessages", async (data) => {
         console.log("load messages içindeyim")
         console.log(data)
@@ -79,6 +80,34 @@ io.on("connection", socket => {
             socket.emit("error", { message: "Mesajlar yüklenemedi" });
         }
     });
+socket.on("sendMessage", async (data) => {
+    const { otherUserId, message } = data;
+    const currentUserId = socket.user.id;
+
+    const channelId = currentUserId < otherUserId 
+        ? `${currentUserId}_${otherUserId}` 
+        : `${otherUserId}_${currentUserId}`;
+
+    try {
+        const result = await pool.query(
+            "INSERT INTO messages (channel_id, sender_id, receiver_id, message, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *",
+            [channelId, currentUserId, otherUserId, message]
+        );
+
+        const newMsg = result.rows[0];
+
+        // Gönderen cihazına
+        socket.emit("messageSent", newMsg);
+
+        // Alıcıya
+        io.to(otherUserId.toString()).emit("newMessage", newMsg);
+
+    } catch (err) {
+        console.error("Mesaj kaydedilemedi:", err);
+        socket.emit("error", { message: "Mesaj kaydedilemedi" });
+    }
+});
+
     
   
     socket.on("disconnect", () => {
